@@ -1,0 +1,4 @@
+.eslintrc.json
+.editorconfig
+test.ts
+.env

@@ -1,0 +1,43 @@
+{
+  "name": "yubikey-async",
+  "version": "0.1.1",
+  "description": "Node.js Promise-based client library for verifying Yubikey OTPs with Yubico's API servers.",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "test": "ts-node test.ts",
+    "start": "tsc",
+    "lint": "eslint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/quinnjr/yubikey-async.git"
+  },
+  "keywords": [
+    "yubikey",
+    "yubico",
+    "otp",
+    "tfa",
+    "async",
+    "promise"
+  ],
+  "author": "Joseph R. Quinn <quinn.josephr@protonmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/quinnjr/yubikey-async/issues"
+  },
+  "homepage": "https://github.com/quinnjr/yubikey-async",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "tslib": "^2.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^15.0.2",
+    "@typescript-eslint/eslint-plugin": "^4.22.1",
+    "@typescript-eslint/parser": "^4.22.1",
+    "dotenv": "^9.0.0",
+    "eslint": "^7.25.0",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
+  }
+}
