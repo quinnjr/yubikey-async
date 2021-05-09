@@ -5,10 +5,22 @@
  * @export
  * @class YubikeyOptions
  */
-export declare class YubikeyOptions {
-    timestamp: number;
-    sl: string;
-    timeout: number;
+export interface YubikeyOptions {
+    [key: string]: any;
+    timestamp?: number;
+    sl?: string;
+    timeout?: number;
+}
+export interface YubikeyResponse {
+    otp: string;
+    nonce: string;
+    h: string;
+    t: string;
+    status: string;
+    timestamp: string;
+    sessioncounter?: string;
+    sessionuse?: string;
+    sl?: number;
 }
 /**
  * Yubikey verification class.
@@ -31,7 +43,7 @@ export declare class Yubikey {
      * @param options Additional options for the request.
      * @returns
      */
-    verify(otp: string, options?: YubikeyOptions): Promise<boolean>;
+    verify(otp: string, options?: YubikeyOptions): Promise<YubikeyResponse>;
     /**
      * Generate a HMAC signature for the request.
      * @param params The parameters of the request.
