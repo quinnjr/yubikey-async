@@ -26,7 +26,7 @@ const Status: Map<string, string> = new Map([
 /**
  * Parameters to send to the Yubico API server.
  */
-class Params {
+class YubikeyRequest {
   [key: string]: string;
 
   constructor(
@@ -43,10 +43,23 @@ class Params {
  * @export
  * @class YubikeyOptions
  */
-export class YubikeyOptions {
-  public timestamp: number = 0;
-  public sl: string = 'secure';
-  public timeout: number = 10;
+export interface YubikeyOptions {
+  [key: string]: any;
+  timestamp?: number;
+  sl?: string;
+  timeout?: number;
+}
+
+export interface YubikeyResponse {
+  otp: string;
+  nonce: string;
+  h: string;
+  t: string;
+  status: string;
+  timestamp: string;
+  sessioncounter?: string;
+  sessionuse?: string;
+  sl?: number;
 }
 
 /**
@@ -78,7 +91,7 @@ export class Yubikey {
    * @param options Additional options for the request.
    * @returns
    */
-  public async verify(otp: string, options?: YubikeyOptions): Promise<boolean> {
+  public async verify(otp: string, options?: YubikeyOptions): Promise<YubikeyResponse> {
     const nonce: string = await new Promise((resolve, reject) => {
       crypto.randomBytes(40, (err, buf) => {
         if(err) reject(err);
@@ -94,11 +107,20 @@ export class Yubikey {
       throw new Error("Client secret was not specified");
     }
 
-    const params: Params = new Params(
+    const params: YubikeyRequest = new YubikeyRequest(
       nonce,
       otp,
       this.clientId
     );
+
+    if(options) {
+      for(const option in options) {
+        Object.defineProperty(params, option, {
+          value: options[option],
+          enumerable: true
+        })
+      }
+    }
 
     const signature = this.generateSignature(params);
 
@@ -119,6 +141,10 @@ export class Yubikey {
 
     response.data = this.parseResponseBody(response.data);
 
+    const signatureServer = response.data.h;
+
+    delete response.data.h;
+
     if(response.data.status !== 'OK') {
       throw new Error(`Yubico server responded with error: ${Status.get(response.data.status)}`);
     }
@@ -131,7 +157,11 @@ export class Yubikey {
       throw new Error('Response nonce does not match request nonce');
     }
 
-    return true;
+    if(this.generateSignature(response.data) !== signatureServer) {
+      throw new Error('Response signature is invalid');
+    }
+
+    return response.data;
   }
 
   /**
@@ -139,7 +169,7 @@ export class Yubikey {
    * @param params The parameters of the request.
    * @returns An HMAC signature of the parameters.
    */
-  private generateSignature(params: Params): string {
+  private generateSignature(params: YubikeyRequest): string {
     if(this.clientSecret) {
       const buf = Buffer.from(this.clientSecret, 'base64');
 
@@ -183,7 +213,7 @@ export class Yubikey {
    * @param escape Whether to escape HTML entities
    * @returns A stringified representation of the request query
    */
-  private querify(params: Params, escape: boolean = false): string {
+  private querify(params: YubikeyRequest, escape: boolean = false): string {
     return Object.keys(params)
       .sort()
       .map((key: string) => {
