@@ -1,13 +1,14 @@
 {
   "name": "yubikey-async",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Node.js Promise-based client library for verifying Yubikey OTPs with Yubico's API servers.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
     "test": "ts-node test.ts",
     "start": "tsc",
-    "lint": "eslint"
+    "lint": "eslint",
+    "prepublishOnly": "tsc"
   },
   "repository": {
     "type": "git",
